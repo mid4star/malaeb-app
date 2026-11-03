@@ -1,21 +1,7 @@
-buildscript {
-    ext.kotlin_version = '1.9.22'
-    repositories {
-        google()
-        mavenCentral()
-        maven {
-            url 'https://storage.googleapis.com/download.flutter.io'
-        }
-    }
-}
-
 allprojects {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url 'https://storage.googleapis.com/download.flutter.io'
-        }
     }
 }
 

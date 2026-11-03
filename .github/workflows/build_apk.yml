@@ -30,38 +30,13 @@ jobs:
       - name: Ensure Assets Directory Exists
         run: mkdir -p assets/images
 
-      - name: Recreate Official Android Platform Wrapper & Update Gradle
-        run: |
-          # Backup our customized configuration files
-          cp android/app/src/main/AndroidManifest.xml /tmp/AndroidManifest.xml.bak
-          cp android/build.gradle /tmp/build.gradle.bak
-          cp android/app/build.gradle /tmp/app_build.gradle.bak
-          
-          # Regenerate official Gradle wrapper and build scripts
-          flutter create --org com.malaeb --project-name malaeb_app --platforms=android .
-          
-          # Restore our customized files
-          cp /tmp/AndroidManifest.xml.bak android/app/src/main/AndroidManifest.xml
-          cp /tmp/build.gradle.bak android/build.gradle
-          cp /tmp/app_build.gradle.bak android/app/build.gradle
-          
-          # Remove duplicate generated MainActivity to avoid collision
-          rm -rf android/app/src/main/kotlin/com/malaeb/malaeb_app
-          
-          # Force Gradle wrapper to 8.4 as required by Android Gradle Plugin 8.3+
-          sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-8.4-all.zip|' android/gradle/wrapper/gradle-wrapper.properties
-          
-          # Ensure AndroidX and Jetifier are enabled
-          echo "android.useAndroidX=true" >> android/gradle.properties
-          echo "android.enableJetifier=true" >> android/gradle.properties
-
       - name: Install Dependencies
         run: flutter pub get
 
       - name: Build Universal Release APK
         run: flutter build apk --release
 
-      - name: Build Split per ABI APKs (Optimized ARM64)
+      - name: Build Split per ABI APKs
         run: flutter build apk --release --split-per-abi
 
       - name: Upload APKs as Artifacts
