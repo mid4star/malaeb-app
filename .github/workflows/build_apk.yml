@@ -1,0 +1,56 @@
+name: Build Malaeb APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.x'
+          channel: 'stable'
+          cache: true
+
+      - name: Resolve Project Directory & Get Packages
+        run: |
+          if [ -f "pubspec.yaml" ]; then
+            echo "Project root is repository root."
+          elif [ -f "malaeb_app/pubspec.yaml" ]; then
+            echo "Project is inside malaeb_app directory."
+            cd malaeb_app
+          fi
+          flutter pub get
+
+      - name: Build Universal Release APK
+        run: |
+          if [ -d "malaeb_app" ]; then cd malaeb_app; fi
+          flutter build apk --release
+
+      - name: Build Split per ABI APKs (Optimized ARM64)
+        run: |
+          if [ -d "malaeb_app" ]; then cd malaeb_app; fi
+          flutter build apk --release --split-per-abi
+
+      - name: Upload APKs as Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: malaeb-release-apk
+          path: |
+            build/app/outputs/flutter-apk/*.apk
+            malaeb_app/build/app/outputs/flutter-apk/*.apk
