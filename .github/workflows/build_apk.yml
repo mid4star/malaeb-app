@@ -27,16 +27,19 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Recreate Official Android Platform Wrapper
+      - name: Recreate Official Android Platform Wrapper & Update Gradle
         run: |
-          # Backup our customized Manifest with TV and streaming permissions
+          # Backup our customized Manifest
           cp android/app/src/main/AndroidManifest.xml /tmp/AndroidManifest.xml.bak
           
-          # Regenerate official Gradle wrapper and build scripts for Flutter 3.22
+          # Regenerate official Gradle wrapper and build scripts
           flutter create --org com.malaeb --project-name malaeb_app --platforms=android .
           
           # Restore our custom Manifest
           cp /tmp/AndroidManifest.xml.bak android/app/src/main/AndroidManifest.xml
+          
+          # Force Gradle wrapper to 8.4 as required by Android Gradle Plugin 8.3+
+          sed -i 's|distributionUrl=.*|distributionUrl=https\\://services.gradle.org/distributions/gradle-8.4-all.zip|' android/gradle/wrapper/gradle-wrapper.properties
           
           # Ensure AndroidX and Jetifier are enabled
           echo "android.useAndroidX=true" >> android/gradle.properties
