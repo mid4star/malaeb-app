@@ -27,30 +27,32 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Resolve Project Directory & Get Packages
+      - name: Recreate Official Android Platform Wrapper
         run: |
-          if [ -f "pubspec.yaml" ]; then
-            echo "Project root is repository root."
-          elif [ -f "malaeb_app/pubspec.yaml" ]; then
-            echo "Project is inside malaeb_app directory."
-            cd malaeb_app
-          fi
-          flutter pub get
+          # Backup our customized Manifest with TV and streaming permissions
+          cp android/app/src/main/AndroidManifest.xml /tmp/AndroidManifest.xml.bak
+          
+          # Regenerate official Gradle wrapper and build scripts for Flutter 3.22
+          flutter create --org com.malaeb --project-name malaeb_app --platforms=android .
+          
+          # Restore our custom Manifest
+          cp /tmp/AndroidManifest.xml.bak android/app/src/main/AndroidManifest.xml
+          
+          # Ensure AndroidX and Jetifier are enabled
+          echo "android.useAndroidX=true" >> android/gradle.properties
+          echo "android.enableJetifier=true" >> android/gradle.properties
+
+      - name: Install Dependencies
+        run: flutter pub get
 
       - name: Build Universal Release APK
-        run: |
-          if [ -d "malaeb_app" ]; then cd malaeb_app; fi
-          flutter build apk --release
+        run: flutter build apk --release
 
       - name: Build Split per ABI APKs (Optimized ARM64)
-        run: |
-          if [ -d "malaeb_app" ]; then cd malaeb_app; fi
-          flutter build apk --release --split-per-abi
+        run: flutter build apk --release --split-per-abi
 
       - name: Upload APKs as Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: malaeb-release-apk
-          path: |
-            build/app/outputs/flutter-apk/*.apk
-            malaeb_app/build/app/outputs/flutter-apk/*.apk
+          path: build/app/outputs/flutter-apk/*.apk
