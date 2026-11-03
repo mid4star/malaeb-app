@@ -35,8 +35,10 @@ jobs:
       - name: Ensure Assets Directory Exists
         run: mkdir -p assets/images
 
-      - name: Install Dependencies
-        run: flutter pub get
+      - name: Clean and Install Dependencies
+        run: |
+          flutter clean
+          flutter pub get
 
       - name: Build Universal Release APK
         run: flutter build apk --release
