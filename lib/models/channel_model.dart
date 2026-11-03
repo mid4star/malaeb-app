@@ -10,6 +10,8 @@ class ChannelModel {
   final String? userAgent;
   final Map<String, String>? headers;
 
+  String get category => tag;
+
   const ChannelModel({
     required this.id,
     required this.name,

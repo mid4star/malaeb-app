@@ -438,9 +438,9 @@ class _MultiPlayerModalState extends State<MultiPlayerModal> {
                             Navigator.pop(ctx);
                             provider.setMultiSlot(slotIndex, {
                               "title": "${m.home} ضد ${m.away}",
-                              "url": m.streamUrl,
+                              "url": m.streamUrl ?? '',
                             });
-                            _startSlotController(slotIndex, m.streamUrl, null);
+                            _startSlotController(slotIndex, m.streamUrl ?? '', null);
                           },
                         );
                       }),
@@ -455,15 +455,15 @@ class _MultiPlayerModalState extends State<MultiPlayerModal> {
                           contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                           leading: const Icon(Icons.tv_rounded, color: Colors.white70),
                           title: Text(c.name, style: const TextStyle(color: Colors.white, fontSize: 13)),
-                          subtitle: Text(c.category, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
+                          subtitle: Text(c.tag, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
                           trailing: const Icon(Icons.add_circle_outline_rounded, color: Colors.white70),
                           onTap: () {
                             Navigator.pop(ctx);
                             provider.setMultiSlot(slotIndex, {
                               "title": c.name,
-                              "url": c.streamUrl,
+                              "url": c.streamUrl ?? '',
                             });
-                            _startSlotController(slotIndex, c.streamUrl, null);
+                            _startSlotController(slotIndex, c.streamUrl ?? '', null);
                           },
                         );
                       }),
